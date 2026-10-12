@@ -126,6 +126,9 @@ export function calculateSMSSSV(
 
   const result = new Result(gen, attacker, defender, move, field, 0, desc);
 
+  if (attacker.hasAbility('Grand Mother Moon') || defender.hasAbility('Grand Mother Moon')) {
+    field.isGravity = true;
+  }
   if (move.category === 'Status' && !move.named('Nature Power')) {
     return result;
   }
@@ -163,7 +166,7 @@ export function calculateSMSSSV(
     'Big Pecks', 'Bulletproof', 'Clear Body', 'Contrary',
     'Damp', 'Dazzling', 'Disguise', 'Dry Skin',
     'Earth Eater', 'Eelevate', 'Filter', 'Flash Fire',
-    'Flower Gift', 'Flower Veil', 'Fluffy', 'Friend Guard',
+    'Flower Gift', 'Flower Veil', 'Fluffy', 'Friend Guard', 'Grand Mother Moon',
     'Fur Coat', 'Good as Gold', 'Grass Pelt', 'Guard Dog',
     'Heatproof', 'Heavy Metal', 'Hyper Cutter', 'Ice Face',
     'Ice Scales', 'Illuminate', 'Immunity', 'Inner Focus',
@@ -178,7 +181,7 @@ export function calculateSMSSSV(
     'Suction Cups', 'Sweet Veil', 'Tangled Feet', 'Telepathy',
     'Tera Shell', 'Thermal Exchange', 'Thick Fat', 'Unaware',
     'Vital Spirit', 'Volt Absorb', 'Water Absorb', 'Water Bubble',
-    'Water Veil', 'Well-Baked Body', 'White Smoke', 'Wind Rider',
+    'Water Veil', 'Water Weight', 'Well-Baked Body', 'White Smoke', 'Wind Rider',
     'Wonder Guard', 'Wonder Skin'
   );
 
@@ -230,6 +233,13 @@ export function calculateSMSSSV(
       attacker.ability = '' as AbilityName;
     }
   }
+  if (
+    defender.hasAbility('Grand Mother Moon') &&
+    move.named('Low Kick', 'Grass Knot', 'Heavy Slam', 'Heat Crash')
+  ) {
+    desc.defenderAbility = defender.ability;
+    return result;
+  }
 
   // Merciless does not ignore Shell Armor, damage dealt to a poisoned Pokemon with Shell Armor
   // will not be a critical hit (UltiMario)
@@ -248,6 +258,10 @@ export function calculateSMSSSV(
       : field.hasWeather('Hail', 'Snow') ? 'Ice'
       : 'Normal';
     isMegaSol ? desc.attackerAbility = attacker.ability : desc.weather = field.weather;
+    desc.moveType = type;
+  } else if (move.named('Judgment') && attacker.hasAbility('Final Verdict')) {
+    type = 'Electric';
+    desc.attackerAbility = attacker.ability;
     desc.moveType = type;
   } else if (move.named('Judgment') && attacker.item && attacker.item.includes('Plate')) {
     type = getItemBoostType(attacker.item)!;
@@ -422,6 +436,18 @@ export function calculateSMSSSV(
       field.isGravity,
       isRingTarget
     );
+  }
+
+  if (attacker.hasAbility('Final Verdict') && move.named('Judgment')) {
+    const targetTypes = defender.teraType && defender.teraType !== 'Stellar'
+      ? [defender.teraType]
+      : defender.types;
+
+    for (const targetType of targetTypes) {
+      typeEffectiveness *= gen.types.get(toID('Ice'))!.effectiveness[targetType]!;
+    }
+
+    desc.attackerAbility = attacker.ability;
   }
 
   if (typeEffectiveness === 0 && move.hasType('Ground') &&
@@ -1210,6 +1236,19 @@ export function calculateBPModsSMSSSV(
   }
 
   // Sheer Force does not power up max moves or remove the effects (SadisticMystic)
+if (attacker.hasAbility('Avenger') && attacker.abilityOn) {
+  bpMods.push(8192);
+  desc.attackerAbility = attacker.ability;
+}
+  if (attacker.hasAbility('Tough Horns')) {
+    if (move.named('Horn Attack')) {
+      bpMods.push(8192);
+      desc.attackerAbility = attacker.ability;
+    } else if (move.named('Megahorn', 'Horn Leech', 'Smart Strike')) {
+      bpMods.push(5325);
+      desc.attackerAbility = attacker.ability;
+    }
+  }
   if (
     (attacker.hasAbility('Sheer Force') &&
       (move.secondaries || move.named('Electro Shot', 'Order Up')) && !move.isMax) ||
@@ -1783,6 +1822,10 @@ export function calculateFinalModsSMSSSV(
     desc.defenderAbility = defender.ability;
   }
 
+if (defender.hasAbility('Water Weight') && move.hasType('Water')) {
+  finalMods.push(2048);
+  desc.defenderAbility = defender.ability;
+}
   if (defender.hasAbility('Solid Rock', 'Filter', 'Prism Armor') && typeEffectiveness > 1) {
     finalMods.push(3072);
     desc.defenderAbility = defender.ability;
