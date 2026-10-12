@@ -265,10 +265,21 @@ export function calculateSMSSSV(
     desc.moveType = type;
   } else if (move.named('Judgment') && attacker.item && attacker.item.includes('Plate')) {
     type = getItemBoostType(attacker.item)!;
-  } else if (move.originalName === 'Techno Blast' &&
-    attacker.item && attacker.item.includes('Drive')) {
+} else if (move.originalName === 'Techno Blast') {
+  const technoBlastSlot = attacker.moves.findIndex(moveName =>
+    typeof moveName === 'string'
+      ? moveName === 'Techno Blast'
+      : (moveName as any).name === 'Techno Blast'
+  );
+
+  if (attacker.named('Oscobain-Mega') && technoBlastSlot >= 0 && technoBlastSlot < 4) {
+    const technoBlastTypes = ['Fire', 'Ice', 'Water', 'Electric'] as const;
+    type = technoBlastTypes[technoBlastSlot];
+  } else if (attacker.item && attacker.item.includes('Drive')) {
     type = getTechnoBlast(attacker.item)!;
-    desc.moveType = type;
+  }
+
+  desc.moveType = type;
   } else if (move.originalName === 'Multi-Attack' &&
     attacker.item && attacker.item.includes('Memory')) {
     type = getMultiAttack(attacker.item)!;

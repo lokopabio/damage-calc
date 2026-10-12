@@ -1424,7 +1424,7 @@ const BW_PATCH: {[name: string]: DeepPartial<MoveData>} = {
     target: 'allAdjacent',
     category: 'Special',
   },
-  'Techno Blast': {bp: 85, type: 'Normal', category: 'Special'},
+  'Techno Blast': {bp: 85, type: 'Normal', isSound: true, category: 'Special'},
   Telekinesis: {bp: 0, type: 'Psychic'},
   'Water Pledge': {bp: 50, type: 'Water', category: 'Special'},
   'Wide Guard': {bp: 0, type: 'Rock', priority: 3},
