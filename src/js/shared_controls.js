@@ -1424,6 +1424,13 @@ var GENERATION = {
 	'9': 9, 'sv': 9
 };
 
+if (typeof SETDEX_SUAJ_SM !== 'undefined') {
+	for (var pokemon in SETDEX_SUAJ_SM) {
+		if (!SETDEX_SM[pokemon]) SETDEX_SM[pokemon] = {};
+		Object.assign(SETDEX_SM[pokemon], SETDEX_SUAJ_SM[pokemon]);
+	}
+}
+
 var SETDEX = [
 	typeof SETDEX_CHAMPIONS === 'undefined' ? {} : SETDEX_CHAMPIONS,
 	typeof SETDEX_RBY === 'undefined' ? {} : SETDEX_RBY,
