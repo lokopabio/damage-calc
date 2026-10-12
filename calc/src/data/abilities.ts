@@ -212,6 +212,14 @@ const XY = BW.concat([
 ]);
 
 const SM = XY.concat([
+  'Water Weight',
+  'Papal Veil',
+  'Avenger',
+  'Grand Mother Moon',
+  'Tough Horns',
+  'Super Sallon',
+  'Final Verdict',
+  'Armed to the Teeth',
   'Battery',
   'Battle Bond',
   'Beast Boost',
